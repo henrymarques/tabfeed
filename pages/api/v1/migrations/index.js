@@ -35,8 +35,7 @@ export default async function _(request, response) {
         dryRun: false,
       });
 
-      if (ranMigrations.length > 0)
-        return response.status(201).json(ranMigrations);
+      if (ranMigrations.length > 0) return response.status(201).json(ranMigrations);
 
       return response.status(200).json(ranMigrations);
     }
