@@ -12,7 +12,7 @@ async function query(queryObject) {
   } catch (error) {
     const serviceErrorObject = new ServiceError({
       cause: error,
-      message: "Erro na query ou de conexão com o banco de dados",
+      message: "Erro na query ou na conexão com o banco de dados",
     });
     throw serviceErrorObject;
   } finally {
