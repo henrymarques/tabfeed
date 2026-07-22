@@ -1,6 +1,6 @@
-import orchestrator from "tests/orchestrator";
-
 import { version as uuidVersion } from "uuid";
+
+import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -11,17 +11,7 @@ beforeAll(async () => {
 describe("GET /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("With exact case match", async () => {
-      await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "MesmoCase",
-          email: "mesmo.case@teste.com",
-          password: "senha123",
-        }),
-      });
+      const testUser = await orchestrator.createUser({ username: "MesmoCase" });
 
       const response = await fetch("http://localhost:3000/api/v1/users/MesmoCase");
       expect(response.status).toBe(200);
@@ -35,7 +25,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "MesmoCase",
-        email: "mesmo.case@teste.com",
+        email: testUser.email,
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -43,16 +33,8 @@ describe("GET /api/v1/users/[username]", () => {
     });
 
     test("With case mismatch", async () => {
-      await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "CaseDiferente",
-          email: "case.diferente@teste.com",
-          password: "senha123",
-        }),
+      const testUser = await orchestrator.createUser({
+        username: "CaseDiferente",
       });
 
       const response = await fetch("http://localhost:3000/api/v1/users/casediferente");
@@ -67,7 +49,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "CaseDiferente",
-        email: "case.diferente@teste.com",
+        email: testUser.email,
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
