@@ -2,6 +2,7 @@ import { version as uuidVersion } from "uuid";
 
 import password from "models/password";
 import user from "models/user";
+
 import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
@@ -80,8 +81,8 @@ describe("POST /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O e-mail informado já está sendo utilizado",
-        action: "Utilize outro e-mail para realizar o cadastro",
+        message: "O e-mail informado já está sendo utilizado.",
+        action: "Utilize outro e-mail para realizar a operação.",
         status_code: 400,
       });
     });
@@ -117,8 +118,8 @@ describe("POST /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O nome de usuário informado já está sendo utilizado",
-        action: "Utilize outro nome de usuário para realizar o cadastro",
+        message: "O nome de usuário informado já está sendo utilizado.",
+        action: "Utilize outro nome de usuário para realizar a operação.",
         status_code: 400,
       });
     });
