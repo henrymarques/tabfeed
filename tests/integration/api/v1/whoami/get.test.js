@@ -68,6 +68,18 @@ describe("GET /api/v1/whoami", () => {
 
       expect(response.status).toBe(401);
 
+      const parsedSetCookie = setCookieParser(response, {
+        map: true,
+      });
+
+      expect(parsedSetCookie.session_id).toEqual({
+        name: "session_id",
+        value: "invalid",
+        maxAge: -1,
+        path: "/",
+        httpOnly: true,
+      });
+
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "UnauthorizedError",
@@ -92,6 +104,19 @@ describe("GET /api/v1/whoami", () => {
       });
 
       expect(response.status).toBe(401);
+
+      // Set-Cookie assertions
+      const parsedSetCookie = setCookieParser(response, {
+        map: true,
+      });
+
+      expect(parsedSetCookie.session_id).toEqual({
+        name: "session_id",
+        value: "invalid",
+        maxAge: -1,
+        path: "/",
+        httpOnly: true,
+      });
 
       const responseBody = await response.json();
 
