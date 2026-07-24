@@ -3,6 +3,7 @@ import retry from "async-retry";
 
 import database from "infra/database";
 import migrator from "models/migrator";
+import session from "models/session";
 import user from "models/user";
 
 async function waitForAllServices() {
@@ -35,11 +36,16 @@ async function createUser(userObject) {
   });
 }
 
+async function createSession(userId) {
+  return await session.create(userId);
+}
+
 const orchestrator = {
-  waitForAllServices,
   clearDatabase,
-  runPendingMigrations,
+  createSession,
   createUser,
+  runPendingMigrations,
+  waitForAllServices,
 };
 
 export default orchestrator;
