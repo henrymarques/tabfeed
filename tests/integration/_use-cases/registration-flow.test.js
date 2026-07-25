@@ -35,7 +35,15 @@ describe("Use case: registration flow (all successful)", () => {
     });
   });
 
-  test("Receive activation email", async () => {});
+  test("Receive activation email", async () => {
+    const lastEmail = await orchestrator.getLastEmail();
+
+    expect(lastEmail.sender).toBe("<contato@tabfeed.com.br>");
+    expect(lastEmail.recipients[0]).toBe("<registration.flow@teste.com>");
+    expect(lastEmail.subject).toBe("Ativação de conta");
+    expect(lastEmail.text).toContain("RegistrationFlow");
+    expect(lastEmail.text).toContain("/cadastro/ativar/");
+  });
 
   test("Activate account", async () => {});
 
