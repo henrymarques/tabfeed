@@ -8,6 +8,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from "infra/errors";
+import authorization from "models/authorization";
 
 import session from "models/session";
 import user from "models/user";
@@ -19,7 +20,7 @@ function onNoMatchHandler(request, response) {
 }
 
 function onErrorHandler(error, request, response) {
-  if (error instanceof NotFoundError || error instanceof ValidationError) {
+  if (error instanceof NotFoundError || error instanceof ValidationError || error instanceof ForbiddenError) {
     return response.status(error.statusCode).json(error);
   }
 
@@ -90,7 +91,7 @@ function canRequest(feature) {
   return function canRequestMiddleware(request, response, next) {
     const userTryingToRequest = request.context.user;
 
-    if (userTryingToRequest.features.includes(feature)) {
+    if (authorization.can(userTryingToRequest, feature)) {
       return next();
     }
 

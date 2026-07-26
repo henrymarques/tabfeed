@@ -1,8 +1,11 @@
 import { createRouter } from "next-connect";
 
 import controller from "infra/controller";
+import { ForbiddenError } from "infra/errors";
+
 import authentication from "models/authentication";
 import session from "models/session";
+import authorization from "models/authorization";
 
 const router = createRouter();
 
@@ -16,6 +19,12 @@ async function postHandler(request, response) {
   const userInputValues = request.body;
 
   const authenticatedUser = await authentication.checkAndGetUser(userInputValues);
+  if (!authorization.can(authenticatedUser, "create:session"))
+    throw new ForbiddenError({
+      message: "Permissão negada.",
+      action: "Contate o suporte se você acredita que isso é um erro.",
+    });
+
   const newSession = await session.create(authenticatedUser.id);
 
   controller.setSessionCookie(newSession.token, response);

@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import retry from "async-retry";
 
 import database from "infra/database";
+import activation from "models/activation";
 import migrator from "models/migrator";
 import session from "models/session";
 import user from "models/user";
@@ -49,6 +50,10 @@ async function createUser(userObject) {
   });
 }
 
+async function activateUser(user) {
+  await activation.activateUserByUserId(user.id);
+}
+
 async function createSession(userId) {
   return await session.create(userId);
 }
@@ -80,6 +85,7 @@ function extractUUID(text) {
 }
 
 const orchestrator = {
+  activateUser,
   clearDatabase,
   createSession,
   createUser,
