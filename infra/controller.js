@@ -1,6 +1,7 @@
 import * as cookie from "cookie";
 
 import {
+  ForbiddenError,
   InternalServerError,
   MethodNotAllowedError,
   NotFoundError,
@@ -9,6 +10,7 @@ import {
 } from "infra/errors";
 
 import session from "models/session";
+import user from "models/user";
 
 function onNoMatchHandler(request, response) {
   const publicErrorObject = new MethodNotAllowedError();
@@ -42,6 +44,38 @@ function setSessionCookie(sessionToken, response) {
   response.setHeader("Set-Cookie", setCookie);
 }
 
+async function injectAnonymousOrUser(request, response, next) {
+  if (request.cookies?.session_id) {
+    await injectAuthenticatedUser(request);
+    return next();
+  }
+
+  injectAnonymousUser(request);
+  return next();
+}
+
+async function injectAuthenticatedUser(request) {
+  const sessionToken = request.cookies.session_id;
+  const sessionObject = await session.findOneValidByToken(sessionToken);
+  const userObject = await user.findOneById(sessionObject.user_id);
+
+  request.context = {
+    ...request.context,
+    user: userObject,
+  };
+}
+
+function injectAnonymousUser(request) {
+  const anonymousUser = {
+    features: ["read:activation_token", "create:session", "create:user"],
+  };
+
+  request.context = {
+    ...request.context,
+    user: anonymousUser,
+  };
+}
+
 function clearSessionCookie(response) {
   const setCookie = cookie.serialize("session_id", "invalid", {
     path: "/",
@@ -52,12 +86,29 @@ function clearSessionCookie(response) {
   response.setHeader("Set-Cookie", setCookie);
 }
 
+function canRequest(feature) {
+  return function canRequestMiddleware(request, response, next) {
+    const userTryingToRequest = request.context.user;
+
+    if (userTryingToRequest.features.includes(feature)) {
+      return next();
+    }
+
+    throw new ForbiddenError({
+      message: "Acesso negado.",
+      action: "Se você acha que isso é um erro, entre em contato com o suporte.",
+    });
+  };
+}
+
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchHandler,
     onError: onErrorHandler,
   },
+  canRequest,
   clearSessionCookie,
+  injectAnonymousOrUser,
   setSessionCookie,
 };
 
