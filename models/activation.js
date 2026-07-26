@@ -1,5 +1,6 @@
 import database from "infra/database";
 import email from "infra/email";
+import { NotFoundError } from "infra/errors";
 import webserver from "infra/webserver";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000;
@@ -27,6 +28,38 @@ async function createToken(userId) {
   }
 }
 
+async function findOneValidById(activationId) {
+  const tokenFound = await runSelectQuery(activationId);
+  return tokenFound;
+
+  async function runSelectQuery(activationId) {
+    const results = await database.query({
+      text: `
+        SELECT
+          *
+        FROM
+          user_activation_tokens
+        WHERE
+          id = $1
+          AND expires_at > NOW()
+          AND used_at IS NULL
+        LIMIT
+          1
+      ;`,
+      values: [activationId],
+    });
+
+    if (results.rowCount === 0) {
+      throw new NotFoundError({
+        message: "Token inválido ou expirado.",
+        action: "Faça o cadastro novamente.",
+      });
+    }
+
+    return results.rows[0];
+  }
+}
+
 async function sendEmailToUser(user, activationToken) {
   const text = `${user.username}, clique no link abaixo para ativar sua conta:
 
@@ -45,6 +78,7 @@ Equipe Tabfeed`;
 
 const activation = {
   createToken,
+  findOneValidById,
   sendEmailToUser,
 };
 
