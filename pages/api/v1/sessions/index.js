@@ -19,11 +19,7 @@ async function postHandler(request, response) {
   const userInputValues = request.body;
 
   const authenticatedUser = await authentication.checkAndGetUser(userInputValues);
-  if (!authorization.can(authenticatedUser, "create:session"))
-    throw new ForbiddenError({
-      message: "Permissão negada.",
-      action: "Contate o suporte se você acredita que isso é um erro.",
-    });
+  if (!authorization.can(authenticatedUser, "create:session")) throw new ForbiddenError({});
 
   const newSession = await session.create(authenticatedUser.id);
 

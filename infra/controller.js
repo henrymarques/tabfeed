@@ -95,10 +95,7 @@ function canRequest(feature) {
       return next();
     }
 
-    throw new ForbiddenError({
-      message: "Acesso negado.",
-      action: "Se você acha que isso é um erro, entre em contato com o suporte.",
-    });
+    throw new ForbiddenError({});
   };
 }
 
