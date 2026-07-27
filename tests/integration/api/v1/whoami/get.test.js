@@ -47,7 +47,7 @@ describe("GET /api/v1/whoami", () => {
         id: testUser.id,
         username: "UserWithValidSession",
         email: testUser.email,
-        features: ["create:session", "read:session"],
+        features: ["create:session", "read:session", "update:user"],
         password: testUser.password,
         created_at: testUser.created_at.toISOString(),
         updated_at: activatedUser.updated_at.toISOString(),
@@ -93,10 +93,8 @@ describe("GET /api/v1/whoami", () => {
 
     test("With expired session", async () => {
       jest.useFakeTimers({ now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS) });
-
       const testUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
       const testSession = await orchestrator.createSession(testUser.id);
-
       jest.useRealTimers();
 
       const response = await fetch("http://localhost:3000/api/v1/whoami", {
@@ -166,7 +164,7 @@ describe("GET /api/v1/whoami", () => {
         id: testUser.id,
         username: "UserWithHalfValidSession",
         email: testUser.email,
-        features: ["create:session", "read:session"],
+        features: ["create:session", "read:session", "update:user"],
         password: testUser.password,
         created_at: testUser.created_at.toISOString(),
         updated_at: activatedUser.updated_at.toISOString(),

@@ -50,8 +50,12 @@ async function createUser(userObject) {
   });
 }
 
-async function activateUser(user) {
-  return await activation.activateUserByUserId(user.id);
+async function activateUser(userObject) {
+  return await activation.activateUserByUserId(userObject.id);
+}
+
+async function addFeaturesToUser(userObject, features) {
+  return await user.addFeatures(userObject.id, features);
 }
 
 async function createSession(userId) {
@@ -86,6 +90,7 @@ function extractUUID(text) {
 
 const orchestrator = {
   activateUser,
+  addFeaturesToUser,
   clearDatabase,
   createSession,
   createUser,
