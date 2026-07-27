@@ -125,4 +125,34 @@ describe("POST /api/v1/users", () => {
       });
     });
   });
+
+  describe("Default user", () => {
+    test("With unique and valid data", async () => {
+      const testUser = await orchestrator.createUser();
+      await orchestrator.activateUser(testUser);
+      const testUserSession = await orchestrator.createSession(testUser.id);
+
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          cookie: `session_id=${testUserSession.token}`,
+        },
+        body: JSON.stringify({
+          username: "usuariologado",
+          email: "testelogado@teste.com",
+          password: "senha123",
+        }),
+      });
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Acesso negado.",
+        action: "Verifique suas permissões antes de continuar.",
+        status_code: 403,
+      });
+    });
+  });
 });
