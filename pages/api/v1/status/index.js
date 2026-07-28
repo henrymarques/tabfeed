@@ -2,9 +2,11 @@ import { createRouter } from "next-connect";
 
 import controller from "infra/controller";
 import database from "infra/database.js";
+import authorization from "models/authorization";
 
 const router = createRouter();
 
+router.use(controller.injectAnonymousOrUser);
 router.get(getHandler);
 
 export default router.handler(controller.errorHandlers);
@@ -20,10 +22,11 @@ async function getHandler(request, response) {
   });
 
   const serverVersion = queryServerVersion.rows[0].server_version;
+
   const maxConnections = parseInt(queryMaxConnections.rows[0].max_connections);
   const openedConnections = queryOpenedConnections.rows[0].count;
 
-  response.status(200).json({
+  const statusObject = {
     updated_at: updatedAt,
     dependencies: {
       database: {
@@ -32,5 +35,9 @@ async function getHandler(request, response) {
         opened_connections: openedConnections,
       },
     },
-  });
+  };
+
+  const secureOutputValues = authorization.filterOutput(request.context.user, "read:status", statusObject);
+
+  response.status(200).json(secureOutputValues);
 }

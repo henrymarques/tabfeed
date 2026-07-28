@@ -48,7 +48,6 @@ describe("GET /api/v1/whoami", () => {
         username: "UserWithValidSession",
         email: testUser.email,
         features: ["create:session", "read:session", "update:user"],
-        password: testUser.password,
         created_at: testUser.created_at.toISOString(),
         updated_at: activatedUser.updated_at.toISOString(),
       });
@@ -165,7 +164,6 @@ describe("GET /api/v1/whoami", () => {
         username: "UserWithHalfValidSession",
         email: testUser.email,
         features: ["create:session", "read:session", "update:user"],
-        password: testUser.password,
         created_at: testUser.created_at.toISOString(),
         updated_at: activatedUser.updated_at.toISOString(),
       });
