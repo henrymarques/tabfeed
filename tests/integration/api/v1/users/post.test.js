@@ -36,8 +36,7 @@ describe("POST /api/v1/users", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "usuario",
-        email: "teste@teste.com",
-        password: responseBody.password,
+        features: ["read:activation_token"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -121,6 +120,36 @@ describe("POST /api/v1/users", () => {
         message: "O nome de usuário informado já está sendo utilizado.",
         action: "Utilize outro nome de usuário para realizar a operação.",
         status_code: 400,
+      });
+    });
+  });
+
+  describe("Default user", () => {
+    test("With unique and valid data", async () => {
+      const testUser = await orchestrator.createUser();
+      await orchestrator.activateUser(testUser);
+      const testUserSession = await orchestrator.createSession(testUser.id);
+
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          cookie: `session_id=${testUserSession.token}`,
+        },
+        body: JSON.stringify({
+          username: "usuariologado",
+          email: "testelogado@teste.com",
+          password: "senha123",
+        }),
+      });
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Acesso negado.",
+        action: "Verifique suas permissões antes de continuar.",
+        status_code: 403,
       });
     });
   });

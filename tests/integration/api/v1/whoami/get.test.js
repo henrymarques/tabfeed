@@ -14,6 +14,7 @@ describe("GET /api/v1/whoami", () => {
   describe("Default user", () => {
     test("With valid session", async () => {
       const testUser = await orchestrator.createUser({ username: "UserWithValidSession" });
+      const activatedUser = await orchestrator.activateUser(testUser);
       const testSession = await orchestrator.createSession(testUser.id);
 
       const response = await fetch("http://localhost:3000/api/v1/whoami", {
@@ -46,9 +47,9 @@ describe("GET /api/v1/whoami", () => {
         id: testUser.id,
         username: "UserWithValidSession",
         email: testUser.email,
-        password: testUser.password,
+        features: ["create:session", "read:session", "update:user"],
         created_at: testUser.created_at.toISOString(),
-        updated_at: testUser.updated_at.toISOString(),
+        updated_at: activatedUser.updated_at.toISOString(),
       });
 
       const renewedSession = await session.findOneValidByToken(testSession.token);
@@ -91,10 +92,8 @@ describe("GET /api/v1/whoami", () => {
 
     test("With expired session", async () => {
       jest.useFakeTimers({ now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS) });
-
       const testUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
       const testSession = await orchestrator.createSession(testUser.id);
-
       jest.useRealTimers();
 
       const response = await fetch("http://localhost:3000/api/v1/whoami", {
@@ -132,6 +131,7 @@ describe("GET /api/v1/whoami", () => {
       jest.useFakeTimers({ now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS / 2) });
 
       const testUser = await orchestrator.createUser({ username: "UserWithHalfValidSession" });
+      const activatedUser = await orchestrator.activateUser(testUser);
       const testSession = await orchestrator.createSession(testUser.id);
 
       jest.useRealTimers();
@@ -163,9 +163,9 @@ describe("GET /api/v1/whoami", () => {
         id: testUser.id,
         username: "UserWithHalfValidSession",
         email: testUser.email,
-        password: testUser.password,
+        features: ["create:session", "read:session", "update:user"],
         created_at: testUser.created_at.toISOString(),
-        updated_at: testUser.updated_at.toISOString(),
+        updated_at: activatedUser.updated_at.toISOString(),
       });
 
       const renewedSession = await session.findOneValidByToken(testSession.token);
