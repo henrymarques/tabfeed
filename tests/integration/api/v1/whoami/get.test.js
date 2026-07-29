@@ -38,6 +38,7 @@ describe("GET /api/v1/whoami", () => {
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         path: "/",
         httpOnly: true,
+        sameSite: "Lax",
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -154,6 +155,7 @@ describe("GET /api/v1/whoami", () => {
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         path: "/",
         httpOnly: true,
+        sameSite: "Lax",
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
