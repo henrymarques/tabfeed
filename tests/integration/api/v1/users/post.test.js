@@ -129,7 +129,7 @@ describe("POST /api/v1/users", () => {
     test("With unique and valid data", async () => {
       const testUser = await orchestrator.createUser();
       await orchestrator.activateUser(testUser);
-      const testUserSession = await orchestrator.createSession(testUser.id);
+      const testUserSession = await orchestrator.createSession(testUser);
 
       const response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",

@@ -16,7 +16,7 @@ describe("GET /api/v1/whoami", () => {
     test("With valid session", async () => {
       const testUser = await orchestrator.createUser({ username: "UserWithValidSession" });
       const activatedUser = await orchestrator.activateUser(testUser);
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
       const response = await fetch(`${webserver.origin}/api/v1/whoami`, {
         headers: {
@@ -94,7 +94,7 @@ describe("GET /api/v1/whoami", () => {
     test("With expired session", async () => {
       jest.useFakeTimers({ now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS) });
       const testUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
       jest.useRealTimers();
 
       const response = await fetch(`${webserver.origin}/api/v1/whoami`, {
@@ -133,7 +133,7 @@ describe("GET /api/v1/whoami", () => {
 
       const testUser = await orchestrator.createUser({ username: "UserWithHalfValidSession" });
       const activatedUser = await orchestrator.activateUser(testUser);
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
       jest.useRealTimers();
 

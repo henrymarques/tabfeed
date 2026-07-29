@@ -15,7 +15,7 @@ describe("DELETE /api/v1/sessions", () => {
   describe("Anonymous user", () => {
     test("With valid session", async () => {
       const testUser = await orchestrator.createUser();
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
       const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "DELETE",
@@ -98,7 +98,7 @@ describe("DELETE /api/v1/sessions", () => {
       jest.useFakeTimers({ now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS) });
 
       const testUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
       jest.useRealTimers();
 
