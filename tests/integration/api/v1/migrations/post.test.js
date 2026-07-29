@@ -26,7 +26,7 @@ describe("POST /api/v1/migrations", () => {
   });
 
   describe("Default user", () => {
-    test("Retrieving pending migrations", async () => {
+    test("Returning pending migrations", async () => {
       const testUser = await orchestrator.createUser();
       await orchestrator.activateUser(testUser);
       const testUserSession = await orchestrator.createSession(testUser.id);
