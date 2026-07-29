@@ -4,13 +4,13 @@ import authorization from "models/authorization";
 
 describe("models/authorization.js", () => {
   describe("authorization.can", () => {
-    test("Without 'user'", () => {
+    test("Without `user`", () => {
       expect(() => {
         authorization.can();
       }).toThrow(InternalServerError);
     });
 
-    test("Without 'user.features'", () => {
+    test("Without `user.features`", () => {
       const testUser = { username: "UserWithoutFeatures" };
 
       expect(() => {
@@ -18,7 +18,7 @@ describe("models/authorization.js", () => {
       }).toThrow(InternalServerError);
     });
 
-    test("With unknown 'features'", () => {
+    test("With unknown `features`", () => {
       const testUser = { features: [] };
 
       expect(() => {
@@ -26,7 +26,7 @@ describe("models/authorization.js", () => {
       }).toThrow(InternalServerError);
     });
 
-    test("With valid 'user' and known 'feature'", () => {
+    test("With valid `user` and known `feature`", () => {
       const testUser = { features: ["create:user"] };
 
       expect(authorization.can(testUser, "create:user")).toBe(true);
@@ -34,13 +34,13 @@ describe("models/authorization.js", () => {
   });
 
   describe("authorization.filterOutput", () => {
-    test("Without 'user'", () => {
+    test("Without `user`", () => {
       expect(() => {
         authorization.filterOutput();
       }).toThrow(InternalServerError);
     });
 
-    test("Without 'user.features'", () => {
+    test("Without `user.features`", () => {
       const testUser = { username: "UserWithoutFeatures" };
 
       expect(() => {
@@ -48,7 +48,7 @@ describe("models/authorization.js", () => {
       }).toThrow(InternalServerError);
     });
 
-    test("With unknown 'features'", () => {
+    test("With unknown `features`", () => {
       const testUser = { features: [] };
 
       expect(() => {
@@ -56,7 +56,7 @@ describe("models/authorization.js", () => {
       }).toThrow(InternalServerError);
     });
 
-    test("With valid 'user', known 'feature' but no 'resource'", () => {
+    test("With valid `user`, known `feature` but no `resource`", () => {
       const testUser = { features: ["read:user"] };
 
       expect(() => {
@@ -64,7 +64,7 @@ describe("models/authorization.js", () => {
       }).toThrow(InternalServerError);
     });
 
-    test("With valid 'user', known 'feature' and 'resource'", () => {
+    test("With valid `user`, known `feature` and `resource`", () => {
       const testUser = { features: ["read:user"] };
       const testResource = {
         id: 1,

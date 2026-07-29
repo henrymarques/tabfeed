@@ -13,7 +13,7 @@ beforeAll(async () => {
 
 describe("PATCH /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
-    test("With unique 'username'", async () => {
+    test("With unique `username`", async () => {
       await orchestrator.createUser({ username: "uniqueUserAnonymous" });
 
       const response = await fetch("http://localhost:3000/api/v1/users/uniqueUserAnonymous", {
@@ -38,7 +38,7 @@ describe("PATCH /api/v1/users/[username]", () => {
   });
 
   describe("Default user", () => {
-    test("With non-existant 'username'", async () => {
+    test("With non-existant `username`", async () => {
       const testUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(testUser);
       const testUserSession = await orchestrator.createSession(activatedUser.id);
@@ -58,7 +58,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
-    test("With duplicated 'username'", async () => {
+    test("With duplicated `username`", async () => {
       await orchestrator.createUser({ username: "user1" });
 
       const testUser = await orchestrator.createUser({ username: "user2" });
@@ -86,7 +86,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
-    test("With 'userB' targeting 'userA'", async () => {
+    test("With `userB` targeting `userA`", async () => {
       await orchestrator.createUser({ username: "userA" });
 
       const testUser = await orchestrator.createUser({ username: "userB" });
@@ -114,7 +114,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
-    test("With duplicated 'email'", async () => {
+    test("With duplicated `email`", async () => {
       await orchestrator.createUser({ email: "email1@teste.com" });
 
       const testUser = await orchestrator.createUser({ email: "email2@teste.com" });
@@ -142,7 +142,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
-    test("With unique 'username'", async () => {
+    test("With unique `username`", async () => {
       const testUser = await orchestrator.createUser({ username: "uniqueUser1" });
       const activatedUser = await orchestrator.activateUser(testUser);
       const testUserSession = await orchestrator.createSession(activatedUser.id);
@@ -176,7 +176,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
 
-    test("With unique 'email'", async () => {
+    test("With unique `email`", async () => {
       const testUser = await orchestrator.createUser({ email: "uniqueEmail1@teste.com" });
       const activatedUser = await orchestrator.activateUser(testUser);
       const testUserSession = await orchestrator.createSession(activatedUser.id);
@@ -210,7 +210,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
 
-    test("With new 'password'", async () => {
+    test("With new `password`", async () => {
       const testUser = await orchestrator.createUser({ password: "password" });
       const activatedUser = await orchestrator.activateUser(testUser);
       const testUserSession = await orchestrator.createSession(activatedUser.id);
@@ -253,7 +253,7 @@ describe("PATCH /api/v1/users/[username]", () => {
   });
 
   describe("Privileged user", () => {
-    test("With 'update:user:others' targeting 'defaultUser'", async () => {
+    test("With `update:user:others` targeting `defaultUser`", async () => {
       const defaultUser = await orchestrator.createUser({ username: "defaultUser" });
 
       const testUser = await orchestrator.createUser({ username: "privilegedUser" });
