@@ -7,13 +7,11 @@ import authentication from "models/authentication";
 import session from "models/session";
 import authorization from "models/authorization";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.post(controller.canRequest("create:session"), postHandler);
-router.delete(deleteHandler);
-
-export default router.handler(controller.errorHandlers);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .post(controller.canRequest("create:session"), postHandler)
+  .delete(deleteHandler)
+  .handler(controller.errorHandlers);
 
 async function postHandler(request, response) {
   const userInputValues = request.body;
