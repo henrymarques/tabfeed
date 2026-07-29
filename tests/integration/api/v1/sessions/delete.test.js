@@ -1,6 +1,7 @@
 import { version as uuidVersion } from "uuid";
 import setCookieParser from "set-cookie-parser";
 
+import webserver from "infra/webserver";
 import session from "models/session";
 import orchestrator from "tests/orchestrator";
 
@@ -14,9 +15,9 @@ describe("DELETE /api/v1/sessions", () => {
   describe("Anonymous user", () => {
     test("With valid session", async () => {
       const testUser = await orchestrator.createUser();
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           Cookie: `session_id=${testSession.token}`,
@@ -53,7 +54,7 @@ describe("DELETE /api/v1/sessions", () => {
       expect(responseBody.updated_at > testSession.updated_at.toISOString()).toBe(true);
 
       // Double check assertions
-      const doubleCheckResponse = await fetch("http://localhost:3000/api/v1/whoami", {
+      const doubleCheckResponse = await fetch(`${webserver.origin}/api/v1/whoami`, {
         headers: {
           Cookie: `session_id=${testSession.token}`,
         },
@@ -75,7 +76,7 @@ describe("DELETE /api/v1/sessions", () => {
       const nonexistentToken =
         "4981f595f05af2f91e7fa24e0536d4840913065b3a72e662b17a0b8cde7d43459004aa9316fab17d48ed2b371b06e86c";
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           Cookie: `session_id=${nonexistentToken}`,
@@ -97,11 +98,11 @@ describe("DELETE /api/v1/sessions", () => {
       jest.useFakeTimers({ now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS) });
 
       const testUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           Cookie: `session_id=${testSession.token}`,

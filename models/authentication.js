@@ -3,7 +3,7 @@ import { NotFoundError, UnauthorizedError } from "infra/errors";
 import password from "models/password";
 import user from "models/user";
 
-async function checkAndGetUser(userInputValues) {
+async function getUser(userInputValues) {
   try {
     const storedUser = await user.findOneByEmail(userInputValues.email);
     await checkPassword(userInputValues.password, storedUser.password);
@@ -32,7 +32,7 @@ async function checkAndGetUser(userInputValues) {
 }
 
 const authentication = {
-  checkAndGetUser,
+  getUser,
 };
 
 export default authentication;

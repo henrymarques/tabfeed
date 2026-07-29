@@ -16,7 +16,7 @@ describe("Use case: registration flow (all successful)", () => {
   let sessionObject;
 
   test("Create user account", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/users", {
+    const response = await fetch(`${webserver.origin}/api/v1/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +58,7 @@ describe("Use case: registration flow (all successful)", () => {
   });
 
   test("Activate account", async () => {
-    const response = await fetch(`http://localhost:3000/api/v1/activations/${activationTokenId}`, {
+    const response = await fetch(`${webserver.origin}/api/v1/activations/${activationTokenId}`, {
       method: "PATCH",
     });
     expect(response.status).toBe(200);
@@ -72,7 +72,7 @@ describe("Use case: registration flow (all successful)", () => {
   });
 
   test("Login", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/sessions", {
+    const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: "registration.flow@teste.com", password: "senha123" }),
@@ -83,7 +83,7 @@ describe("Use case: registration flow (all successful)", () => {
     sessionObject = { ...responseBody };
     expect(responseBody.user_id).toBe(createdUser.id);
 
-    const response2 = await fetch(`http://localhost:3000/api/v1/activations/${activationTokenId}`, {
+    const response2 = await fetch(`${webserver.origin}/api/v1/activations/${activationTokenId}`, {
       method: "PATCH",
       headers: { cookie: `session_id=${sessionObject.token}` },
     });
@@ -91,7 +91,7 @@ describe("Use case: registration flow (all successful)", () => {
   });
 
   test("Get user information", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/whoami", {
+    const response = await fetch(`${webserver.origin}/api/v1/whoami`, {
       headers: { cookie: `session_id=${sessionObject.token}` },
     });
 

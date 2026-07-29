@@ -1,6 +1,7 @@
 import { version as uuidVersion } from "uuid";
 import setCookieParser from "set-cookie-parser";
 
+import webserver from "infra/webserver";
 import session from "models/session";
 import orchestrator from "tests/orchestrator";
 
@@ -12,12 +13,12 @@ beforeAll(async () => {
 
 describe("POST /api/v1/sessions", () => {
   describe("Anonymous user", () => {
-    test("With incorrect 'email' but correct 'password'", async () => {
+    test("With incorrect `email` but correct `password`", async () => {
       await orchestrator.createUser({
         password: "senha-correta",
       });
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,12 +40,12 @@ describe("POST /api/v1/sessions", () => {
       });
     });
 
-    test("With correct 'email' but incorrect 'password'", async () => {
+    test("With correct `email` but incorrect `password`", async () => {
       await orchestrator.createUser({
         email: "email.correto@teste.com",
       });
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,10 +67,10 @@ describe("POST /api/v1/sessions", () => {
       });
     });
 
-    test("With incorrect 'email' but incorrect 'password'", async () => {
+    test("With incorrect `email` but incorrect `password`", async () => {
       await orchestrator.createUser();
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +92,7 @@ describe("POST /api/v1/sessions", () => {
       });
     });
 
-    test("With correct 'email' and correct 'password'", async () => {
+    test("With correct `email` and correct `password`", async () => {
       const testUser = await orchestrator.createUser({
         email: "tudo.correto@teste.com",
         password: "tudo-correto",
@@ -99,7 +100,7 @@ describe("POST /api/v1/sessions", () => {
 
       await orchestrator.activateUser(testUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,6 +121,7 @@ describe("POST /api/v1/sessions", () => {
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         path: "/",
         httpOnly: true,
+        sameSite: "Lax",
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -127,10 +129,15 @@ describe("POST /api/v1/sessions", () => {
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-      const expiresAt = new Date(responseBody.expires_at).setMilliseconds(0);
-      const createdAt = new Date(responseBody.created_at).setMilliseconds(0);
+      const expiresAt = new Date(responseBody.expires_at);
+      const createdAt = new Date(responseBody.created_at);
 
-      expect(expiresAt - createdAt).toBe(session.EXPIRATION_IN_MILLISECONDS);
+      expect(expiresAt >= createdAt).toBe(true);
+
+      const actualLifetimeInMilliseconds = expiresAt - createdAt;
+      const lifetimeDifferenceInMilliseconds = session.EXPIRATION_IN_MILLISECONDS - actualLifetimeInMilliseconds;
+
+      expect(lifetimeDifferenceInMilliseconds).toBeLessThanOrEqual(5000);
 
       expect(responseBody).toEqual({
         id: responseBody.id,

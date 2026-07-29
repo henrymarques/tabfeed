@@ -4,14 +4,12 @@ import controller from "infra/controller";
 import database from "infra/database.js";
 import authorization from "models/authorization";
 
-const router = createRouter();
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(unnecessaryLongGetHandlerName)
+  .handler(controller.errorHandlers);
 
-router.use(controller.injectAnonymousOrUser);
-router.get(getHandler);
-
-export default router.handler(controller.errorHandlers);
-
-async function getHandler(request, response) {
+async function unnecessaryLongGetHandlerName(request, response) {
   const updatedAt = new Date().toISOString();
 
   const queryServerVersion = await database.query("SHOW server_version;");
@@ -39,5 +37,5 @@ async function getHandler(request, response) {
 
   const secureOutputValues = authorization.filterOutput(request.context.user, "read:status", statusObject);
 
-  response.status(200).json(secureOutputValues);
+  return response.status(200).json(secureOutputValues);
 }

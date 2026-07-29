@@ -1,8 +1,9 @@
 import { version as uuidVersion } from "uuid";
 import setCookieParser from "set-cookie-parser";
 
-import orchestrator from "tests/orchestrator.js";
+import webserver from "infra/webserver";
 import session from "models/session";
+import orchestrator from "tests/orchestrator.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -15,9 +16,9 @@ describe("GET /api/v1/whoami", () => {
     test("With valid session", async () => {
       const testUser = await orchestrator.createUser({ username: "UserWithValidSession" });
       const activatedUser = await orchestrator.activateUser(testUser);
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/whoami", {
+      const response = await fetch(`${webserver.origin}/api/v1/whoami`, {
         headers: {
           Cookie: `session_id=${testSession.token}`,
         },
@@ -37,6 +38,7 @@ describe("GET /api/v1/whoami", () => {
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         path: "/",
         httpOnly: true,
+        sameSite: "Lax",
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -61,7 +63,7 @@ describe("GET /api/v1/whoami", () => {
       const nonexistentToken =
         "4981f595f05af2f91e7fa24e0536d4840913065b3a72e662b17a0b8cde7d43459004aa9316fab17d48ed2b371b06e86c";
 
-      const response = await fetch("http://localhost:3000/api/v1/whoami", {
+      const response = await fetch(`${webserver.origin}/api/v1/whoami`, {
         headers: {
           Cookie: `session_id=${nonexistentToken}`,
         },
@@ -93,10 +95,10 @@ describe("GET /api/v1/whoami", () => {
     test("With expired session", async () => {
       jest.useFakeTimers({ now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS) });
       const testUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/whoami", {
+      const response = await fetch(`${webserver.origin}/api/v1/whoami`, {
         headers: {
           Cookie: `session_id=${testSession.token}`,
         },
@@ -132,11 +134,11 @@ describe("GET /api/v1/whoami", () => {
 
       const testUser = await orchestrator.createUser({ username: "UserWithHalfValidSession" });
       const activatedUser = await orchestrator.activateUser(testUser);
-      const testSession = await orchestrator.createSession(testUser.id);
+      const testSession = await orchestrator.createSession(testUser);
 
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/whoami", {
+      const response = await fetch(`${webserver.origin}/api/v1/whoami`, {
         headers: {
           Cookie: `session_id=${testSession.token}`,
         },
@@ -153,6 +155,7 @@ describe("GET /api/v1/whoami", () => {
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         path: "/",
         httpOnly: true,
+        sameSite: "Lax",
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);

@@ -1,5 +1,6 @@
 import { version as uuidVersion } from "uuid";
 
+import webserver from "infra/webserver";
 import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
@@ -13,7 +14,7 @@ describe("GET /api/v1/users/[username]", () => {
     test("With exact case match", async () => {
       await orchestrator.createUser({ username: "MesmoCase" });
 
-      const response = await fetch("http://localhost:3000/api/v1/users/MesmoCase");
+      const response = await fetch(`${webserver.origin}/api/v1/users/MesmoCase`);
       expect(response.status).toBe(200);
 
       const responseBody = await response.json();
@@ -36,7 +37,7 @@ describe("GET /api/v1/users/[username]", () => {
         username: "CaseDiferente",
       });
 
-      const response = await fetch("http://localhost:3000/api/v1/users/casediferente");
+      const response = await fetch(`${webserver.origin}/api/v1/users/casediferente`);
       expect(response.status).toBe(200);
 
       const responseBody = await response.json();
@@ -55,7 +56,7 @@ describe("GET /api/v1/users/[username]", () => {
     });
 
     test("With non-existant username", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/users/UsuarioInexistente");
+      const response = await fetch(`${webserver.origin}/api/v1/users/UsuarioInexistente`);
       expect(response.status).toBe(404);
 
       const responseBody = await response.json();
